@@ -1,0 +1,43 @@
+version: "3.2"
+services:
+  php-myadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    links:
+      - mysql
+    ports:
+      - 9978:80
+    networks:
+      - backend
+   
+    environment:
+      - PMA_ARBITRARY=1
+
+  php:
+    build: './php/'
+    networks:
+      - backend
+    volumes:
+      - ./public_html/:/var/www/html/
+  apache:
+    build: './apache/'
+    depends_on:
+      - php
+      - mysql
+    networks:
+      - frontend
+      - backend
+    ports:
+      - "9977:80"
+    volumes:
+      - ./public_html/:/var/www/html/
+  mysql:
+    image: mysql:5.6.40
+    ports:
+     - "3311:3306"
+    networks:
+      - backend
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpassword
+networks:
+  frontend:
+  backend:
